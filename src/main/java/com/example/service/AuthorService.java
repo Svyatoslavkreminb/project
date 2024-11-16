@@ -2,9 +2,9 @@ package com.example.service;
 
 import com.example.exception.EntityNotFoundException;
 import com.example.model.Author;
+import com.example.repositories.AuthorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.example.repositories.AuthorRepository;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -18,13 +18,13 @@ public class AuthorService {
         return authorRepository.findAll();
     }
 
-    public Author findById(Long id) {
+    public Author findById(Long id) throws EntityNotFoundException {
         return authorRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Author not found"));
     }
 
     @Transactional
     public Author save(Author author) {
-        return authorRepository.save(author);
+        return authorRepository.saveAndFlush(author);
     }
 
     @Transactional
@@ -32,12 +32,11 @@ public class AuthorService {
         Author author = findById(id);
         author.setName(authorDetails.getName());
         author.setBio(authorDetails.getBio());
-        return authorRepository.save(author);
+        return authorRepository.saveAndFlush(author);
     }
 
     @Transactional
     public void delete(Long id) {
-        Author author = findById(id);
-        authorRepository.delete(author);
+        authorRepository.deleteById(id);
     }
 }

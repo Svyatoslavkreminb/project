@@ -24,7 +24,7 @@ public class BookService {
 
     @Transactional
     public Book save(Book book) {
-        return bookRepository.save(book);
+        return bookRepository.saveAndFlush(book);
     }
 
     @Transactional
@@ -33,12 +33,11 @@ public class BookService {
         book.setTitle(bookDetails.getTitle());
         book.setDescription(bookDetails.getDescription());
         book.setAuthor(bookDetails.getAuthor());
-        return bookRepository.save(book);
+        return bookRepository.saveAndFlush(book);
     }
 
     @Transactional
     public void delete(Long id) {
-        Book book = findById(id);
-        bookRepository.delete(book);
+        bookRepository.deleteById(id);
     }
 }
