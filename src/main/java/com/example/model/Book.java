@@ -1,21 +1,23 @@
 package com.example.model;
-import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import jakarta.persistence.*;
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id"
+)
 @Entity
 @Table(name = "books")
 public class Book {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     private Long id;
-
     private String title;
-
     private String description;
-
-    @ManyToOne
-    @JoinColumn(name = "author_id")
     private Author author;
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long getId() {
         return id;
     }
@@ -24,6 +26,7 @@ public class Book {
         this.id = id;
     }
 
+    @Column(name = "title", nullable = false, length = 50)
     public String getTitle() {
         return title;
     }
@@ -32,6 +35,7 @@ public class Book {
         this.title = title;
     }
 
+    @Column(name = "description", length = 100)
     public String getDescription() {
         return description;
     }
@@ -40,6 +44,8 @@ public class Book {
         this.description = description;
     }
 
+    @ManyToOne
+    @JoinColumn(name = "author_id", nullable = false)
     public Author getAuthor() {
         return author;
     }

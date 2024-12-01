@@ -2,20 +2,22 @@ package com.example.controller;
 
 import com.example.exception.EntityNotFoundException;
 import com.example.model.Author;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.service.AuthorService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.example.service.AuthorService;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/authors")
-
 public class AuthorController {
-    @Autowired
+
+
     private AuthorService authorService;
+    public AuthorController(AuthorService authorService){
+        this.authorService = authorService;
+    }
 
     @GetMapping
     public List<Author> getAllAuthors() {
