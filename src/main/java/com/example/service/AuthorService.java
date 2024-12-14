@@ -1,5 +1,7 @@
 package com.example.service;
 
+import com.example.converter.AuthorConverter;
+import com.example.dto.AuthorDTO;
 import com.example.exception.EntityNotFoundException;
 import com.example.model.Author;
 import com.example.repositories.AuthorRepository;
@@ -8,35 +10,61 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AuthorService {
+    private  AuthorRepository authorRepository;
+    private  AuthorConverter authorConverter;
+
     @Autowired
-    private AuthorRepository authorRepository;
-
-    public List<Author> findAll() {
-        return authorRepository.findAll();
+    public AuthorService(AuthorRepository authorRepository, AuthorConverter authorConverter) {
+        this.authorRepository = authorRepository;
+        this.authorConverter = authorConverter;
     }
 
-    public Author findById(Long id) throws EntityNotFoundException {
-        return authorRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Author not found"));
+
+
+    public List<AuthorDTO> findAll() {
+        return authorRepository.findAll().stream()
+                .map(authorConverter::toDTO)
+                .collect(Collectors.toList());
     }
 
-    @Transactional
-    public Author save(Author author) {
-        return authorRepository.saveAndFlush(author);
-    }
 
-    @Transactional
-    public Author update(Long id, Author authorDetails) {
-        Author author = findById(id);
-        author.setName(authorDetails.getName());
-        author.setBio(authorDetails.getBio());
-        return authorRepository.saveAndFlush(author);
+    public AuthorDTO findById(Long id) throws EntityNotFoundException {
+        Author author = authorRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Author not found"));
+        return authorConverter.toDTO(author);
     }
 
     @Transactional
-    public void delete(Long id) {
+    public AuthorDTO save(AuthorDTO authorDTO) {
+        Author author = authorConverter.toEntity(authorDTO);
+        Author savedAuthor = authorRepository.saveAndFlush(author);
+        return authorConverter.toDTO(savedAuthor);
+    }
+
+
+    @Transactional
+    public AuthorDTO update(Long id, AuthorDTO authorDTO) throws EntityNotFoundException {
+        Author existingAuthor = authorRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Author not found"));
+
+
+        existingAuthor.setName(authorDTO.getName());
+        existingAuthor.setBio(authorDTO.getBio());
+
+        Author updatedAuthor = authorRepository.saveAndFlush(existingAuthor);
+        return authorConverter.toDTO(updatedAuthor);
+    }
+
+
+    @Transactional
+    public void delete(Long id) throws EntityNotFoundException {
+        if (!authorRepository.existsById(id)) {
+            throw new EntityNotFoundException("Author not found");
+        }
         authorRepository.deleteById(id);
     }
 }

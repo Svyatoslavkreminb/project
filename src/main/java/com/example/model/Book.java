@@ -1,12 +1,9 @@
 package com.example.model;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
-@JsonIdentityInfo(
-        generator = ObjectIdGenerators.PropertyGenerator.class,
-        property = "id"
-)
+
+import java.util.Objects;
+
 @Entity
 @Table(name = "books")
 public class Book {
@@ -14,7 +11,7 @@ public class Book {
     private Long id;
     private String title;
     private String description;
-    private Author author;
+    private Long author;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,13 +41,25 @@ public class Book {
         this.description = description;
     }
 
-    @ManyToOne
-    @JoinColumn(name = "author_id", nullable = false)
-    public Author getAuthor() {
+
+    @Column(name = "author_id", nullable = false)
+    public Long getAuthor() {
         return author;
     }
 
-    public void setAuthor(Author author) {
+    public void setAuthor(Long author) {
         this.author = author;
+    }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Book book = (Book) o;
+        return Objects.equals(id, book.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }
